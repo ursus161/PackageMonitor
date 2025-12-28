@@ -2,8 +2,9 @@
 
 #tema itbi branch backend 
 
-csv_file="../data/packages.csv"
-last_run_file="../data/.last_run"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+csv_file="$SCRIPT_DIR/../data/packages.csv"
+last_run_file="$SCRIPT_DIR/../data/.last_run"
 fisier_de_lucru=$(mktemp)
 #fisier temporar in care sa prelucrez date inainte de append la csv main
 

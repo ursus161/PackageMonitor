@@ -1,6 +1,7 @@
 #!/bin/bash
 
-CSV="../data/packages.csv"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CSV="$SCRIPT_DIR/../data/packages.csv"
 
 
 echo "test duplicate..."
