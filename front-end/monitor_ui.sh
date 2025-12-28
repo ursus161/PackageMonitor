@@ -1,5 +1,61 @@
 csv_file="../data/packages.csv" #iau datele necesare din csv
 
+lista_pachete() {
+  echo "=============================== Lista de pachete ============================== "
+  echo "Optiuni:"
+  echo "1. Pachete instalate si data ultimei instalari"
+  echo "2. Pachete instalate, dar eliminate si data ultimei eliminari"
+  echo "Introduceti optiunea (1/2):"
+  read optiune
+  case $optiune in
+    1) pachete_instalate
+      ;;
+    2) pachete_eliminate
+      ;;
+    *)
+      echo "Optiune invalida. Incearca din nou."
+            echo ""
+            echo "Apasă ENTER pentru a reveni la meniu..."
+            read
+            ;;
+  esac
+}
+
+pachete_instalate() {
+  echo "============================== Pachete instalate ============================== "
+  echo ""
+  tail -n +2 "$csv_file" | awk -F',' '
+  {
+    date = $1
+    action = $2
+    package = $3
+    version = $4
+
+    if (action == "installed") {
+      is_installed[package] = 1
+      install_date[package] = date
+    } else if (action == "removed") {
+      is_installed[package] = 0
+    }
+  }
+  END {
+    i = 0
+    printf "%-25s %-20s\n", "DATA ULTIMEI INSTALARI", "PACHET"
+    for (p in is_installed) {
+      if(is_installed[p] == 1) {
+        printf "%-25s %-20s\n", install_date[p], p
+        i++
+      }
+    }
+    print "============================================================================"
+      print "Total pachete instalate : " i
+  }'
+
+  echo ""
+  echo "Apasa ENTER pentru a reveni la meniu.."
+  read
+}
+
 istoric_pachet(){
     echo "Introdu numele pachetului:"
     read package_name
@@ -37,7 +93,7 @@ do
     clear
     echo "=== PACKAGE MONITOR ==="
     echo "Optiuni:"
-    echo "1. Pachete instalate" #1 va contine functionalitatea 1 si 2. ulterior, se cere care dintre ele
+    echo "1. Lista pachete" #1 va contine functionalitatea 1 si 2. ulterior, se cere care dintre ele
     echo "2. Istoric pachet" #asta e functionalitatea 3
     echo "3. Interval timp pachet" #pachetele instalate/eliminate într-un interval de timp.
     echo "4. Iesire" #bye bye
@@ -46,7 +102,7 @@ do
     read optiune
 
     case $optiune in
-        1) #whatever optiunea 1
+        1)  lista_pachete
             ;;
         2)
             istoric_pachet
