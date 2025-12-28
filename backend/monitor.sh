@@ -3,6 +3,7 @@
 #tema itbi branch backend 
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 csv_file="$SCRIPT_DIR/../data/packages.csv"
 last_run_file="$SCRIPT_DIR/../data/.last_run"
 fisier_de_lucru=$(mktemp)
@@ -22,8 +23,15 @@ if [ -f "$csv_file" ]; then
 fi
 
 echo "timestamp,action,package,version" > "$csv_file"
+sed -i 's/ ,/,/g; s/, /,/g' "$fisier_de_lucru" #am observat spatii fara sens in csv si asa le sterg
 sort -u "$fisier_de_lucru" >> "$csv_file" #flagul -u e pt unic
 
+
+current_states="../data/current_packages.csv"
+echo "package,version" > "$current_states" 2>/dev/null
+dpkg-query -W -f='${Package},${Version}\n' >> "$current_states"
+#aici citesc din var/lib/dpkg/status in loc de var/log/dpkg.log, nu mai prezint tot istoricul precum in packages.csv
+#se va afla in current_packages.csv doar statusul curent al pachetelor
 date "+%Y-%m-%d %H:%M:%S" > "$last_run_file"
 
 rm -f "$fisier_de_lucru"
