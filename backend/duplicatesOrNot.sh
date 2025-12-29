@@ -13,3 +13,6 @@ if [ "$BEFORE" -eq "$AFTER" ]; then
 else
     echo "duplicate: $BEFORE si $AFTER"
 fi
+
+#ideea scriptului: 
+#rulez monitor.sh si verific daca numarul de linii din packages.csv a ramas acelasi
