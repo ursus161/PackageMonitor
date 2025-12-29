@@ -27,7 +27,8 @@ sed -i 's/ ,/,/g; s/, /,/g' "$fisier_de_lucru" #am observat spatii fara sens in 
 sort -u "$fisier_de_lucru" >> "$csv_file" #flagul -u e pt unic
 
 
-current_states="../data/current_packages.csv"
+current_states="data/current_packages.csv"
+
 echo "package,version" > "$current_states" 2>/dev/null
 dpkg-query -W -f='${Package},${Version}\n' >> "$current_states"
 #aici citesc din var/lib/dpkg/status in loc de var/log/dpkg.log, nu mai prezint tot istoricul precum in packages.csv
