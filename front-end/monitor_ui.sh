@@ -56,6 +56,39 @@ pachete_instalate() {
   read
 }
 
+pachete_eliminate() {
+  echo "============================= Pachete eliminate ============================="
+  echo ""
+  tail -n +2 "$csv_file" | awk -F',' '
+    {
+      date = $1
+      action = $2
+      package = $3
+
+      last_action[package] = action
+
+      if (action == "removed") {
+        last_removed_date[package] = date
+      }
+    }
+    END {
+      i = 0
+      printf "%-25s %-20s\n", "DATA ULTIMEI ELIMINARI", "PACHET"
+      for (p in last_action) {
+        if(last_action[p] == "removed") {
+          printf "%-25s %-20s\n", last_removed_date[p], p
+          i++
+        }
+      }
+      print "============================================================================"
+      print "Total pachete eliminate : " i
+  }'
+
+  echo ""
+  echo "Apasa ENTER pentru a reveni la meniu.."
+  read
+}
+
 istoric_pachet(){
     echo "Introdu numele pachetului:"
     read package_name
