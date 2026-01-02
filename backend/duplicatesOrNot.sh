@@ -1,6 +1,7 @@
 #!/bin/bash
 
-CSV="../data/packages.csv"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CSV="$SCRIPT_DIR/../data/packages.csv"
 
 
 echo "test duplicate..."
@@ -12,3 +13,6 @@ if [ "$BEFORE" -eq "$AFTER" ]; then
 else
     echo "duplicate: $BEFORE si $AFTER"
 fi
+
+#ideea scriptului: 
+#rulez monitor.sh si verific daca numarul de linii din packages.csv a ramas acelasi
