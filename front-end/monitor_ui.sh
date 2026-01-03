@@ -1,6 +1,8 @@
 #!/bin/bash
 
 csv_file="../data/packages.csv"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+csv_file="$SCRIPT_DIR/../data/packages.csv"
 
 
 csv_file="../data/packages.csv"
@@ -100,13 +102,22 @@ istoric_pachet(){
 
     echo "======================= Istoria pentru pachetul: $package_name ======================="
     echo ""
-    rezultate=$(grep -w "$package_name" "$csv_file")
+    rezultate=$(awk -F, -v pkg="$package_name" '$3 == pkg' "$csv_file")
+    rez_similare=$(awk -F',' -v pkg="$package_name" '$3 ~ pkg {print $3}' "$csv_file" | sort -u)
 
     if [[ -z "$rezultate" ]]
     then
-        echo "Nu am gasit informatii despre istoria pachetului '$package_name'"
+        echo "Nu am gasit informatii despre istoria pachetului cu exact numele '$package_name'."
+        echo "================================================================================"
+        if [[ -n "$rez_similare" ]]
+        then
+            echo "Dar am gasit rezultate similare pentru:"
+            echo "$rez_similare" | head -5
+            echo "================================================================================"
+            echo ""
+        fi
     else
-        printf "%-25s %-15s %-20s %-20s\n" "DATA" "ACTIUNE" "PACHET" "VERSIUNE"
+        printf "%-25s %-15s %-20s %-20s\n" "DATA" "ACTIUNE" "PACHET" "VERSIUNE" 
         echo "================================================================================"
         echo "$rezultate" | awk -F, '{printf "%-25s %-15s %-20s %-20s\n", $1, $2, $3, $4}'
         echo "================================================================================"
@@ -116,6 +127,7 @@ istoric_pachet(){
     echo ""
     echo "Apasa ENTER pentru a reveni la meniu"
     read -r
+
 }
 
 interval_pachete(){
@@ -123,8 +135,7 @@ interval_pachete(){
     echo "Introdu data de inceput:"
     read -r start
 
-    if ! echo "$start" | grep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" > /dev/null #1 daca nu gaseste, 0 daca gaseste => negare
-    then
+     if ! date -d "$start" &>/dev/null; then
         echo "Data de inceput este invalida. Try again."
         interval_pachete
         return
@@ -132,17 +143,16 @@ interval_pachete(){
 
     echo "Introdu data de sfarsit:"
     read -r end
-    if ! echo "$end" | grep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" > /dev/null #1 daca nu gaseste, 0 daca gaseste
-    then
+     if ! date -d "$end" &>/dev/null; then
         echo "Data de sfarsit este invalida. Try again."
         interval_pachete
         return
     fi
 
-    s_complet="$start 00:00:00"
-    e_complet="$end 23:59:59"
-
-
+    s_complet="$start 00:00:00"  
+    e_complet="$end 23:59:59" 
+    
+    
     if [[ "$s_complet" > "$e_complet" ]]
     then
         echo "Data de inceput nu poate fi mai mare decat data de sfarsit. Try again."
@@ -150,15 +160,15 @@ interval_pachete(){
         return
     fi
 
-
+    
     gasit=0
-    while IFS=, read -r data_csv actiune pachet versiune
-    do
-
+    while IFS=, read -r data_csv actiune pachet versiune 
+    do 
+        
         if [[ "$data_csv" == "timestamp" ]]
-        then continue
+        then continue 
         fi
-
+        
         if [[ "$data_csv" > "$s_complet" || "$data_csv" == "$s_complet" ]] && [[ "$data_csv" < "$e_complet" || "$data_csv" == "$e_complet" ]]
         then
             ((gasit++))
@@ -166,7 +176,7 @@ interval_pachete(){
             then
                 echo "Rezultate intre $start si $end:"
                 echo "================================================================================"
-                printf "%-25s %-15s %-20s %-20s\n" "DATA" "ACTIUNE" "PACHET" "VERSIUNE"
+                printf "%-25s %-15s %-20s %-20s\n" "DATA" "ACTIUNE" "PACHET" "VERSIUNE" 
                 echo ""
             fi
              printf "%-25s %-15s %-20s %-20s\n" "$data_csv" "$actiune" "$pachet" "$versiune"
@@ -175,7 +185,7 @@ interval_pachete(){
     done < "$csv_file"
 
     if [ $gasit -eq 0 ]
-    then
+    then    
         echo "Nu am gasit niciun rezultat pentru acest interval"
     fi
     echo "================================================================================"
@@ -183,7 +193,6 @@ interval_pachete(){
     echo ""
     echo "Apasa ENTER pentru a reveni la meniu"
     read -r
-    read
 }
 
 
@@ -193,7 +202,7 @@ interval_pachete(){
 
 csv_ok=1
 if [ -z "$csv_file" ]
-then
+then 
     echo "Nu am putut primi nicio informatie din fisierul CSV"
     csv_ok=0
 fi
@@ -209,16 +218,16 @@ do
     clear
     echo "=== PACKAGE MONITOR ==="
     echo "Optiuni:"
-    echo "1. Pachete instalate"
-    echo "2. Istoric pachet"
-    echo "3. Interval timp pachete"
-    echo "4. Iesire"
+    echo "1. Pachete instalate" #1 va contine functionalitatea 1 si 2. ulterior, se cere care dintre ele (iasmina)
+    echo "2. Istoric pachet" 
+    echo "3. Interval timp pachete" 
+    echo "4. Iesire" 
     echo "======================="
     echo "Introduceti optiunea (1-4):"
     read -r optiune
 
     case $optiune in
-        1)
+        1) 
             ;;
         2)
             istoric_pachet
