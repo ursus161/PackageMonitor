@@ -1,6 +1,7 @@
 #!/bin/bash
 
-csv_file="../data/packages.csv" 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+csv_file="$SCRIPT_DIR/../data/packages.csv"
 
 
 istoric_pachet(){
@@ -9,11 +10,20 @@ istoric_pachet(){
 
     echo "======================= Istoria pentru pachetul: $package_name ======================="
     echo ""
-    rezultate=$(grep -w "$package_name" "$csv_file")
+    rezultate=$(awk -F, -v pkg="$package_name" '$3 == pkg' "$csv_file")
+    rez_similare=$(awk -F',' -v pkg="$package_name" '$3 ~ pkg {print $3}' "$csv_file" | sort -u)
 
     if [[ -z "$rezultate" ]]
     then
-        echo "Nu am gasit informatii despre istoria pachetului '$package_name'"
+        echo "Nu am gasit informatii despre istoria pachetului cu exact numele '$package_name'."
+        echo "================================================================================"
+        if [[ -n "$rez_similare" ]]
+        then
+            echo "Dar am gasit rezultate similare pentru:" 
+            echo "$rez_similare" | head -5 
+            echo "================================================================================"
+            echo ""
+        fi
     else
         printf "%-25s %-15s %-20s %-20s\n" "DATA" "ACTIUNE" "PACHET" "VERSIUNE" 
         echo "================================================================================"
@@ -25,6 +35,7 @@ istoric_pachet(){
     echo ""
     echo "Apasa ENTER pentru a reveni la meniu"
     read -r
+
 }
 
 interval_pachete(){
@@ -32,8 +43,7 @@ interval_pachete(){
     echo "Introdu data de inceput:"
     read -r start
 
-    if ! echo "$start" | grep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" > /dev/null #1 daca nu gaseste, 0 daca gaseste => negare
-    then   
+     if ! date -d "$start" &>/dev/null; then
         echo "Data de inceput este invalida. Try again."
         interval_pachete
         return
@@ -41,8 +51,7 @@ interval_pachete(){
 
     echo "Introdu data de sfarsit:"
     read -r end
-    if ! echo "$end" | grep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" > /dev/null #1 daca nu gaseste, 0 daca gaseste
-    then   
+     if ! date -d "$end" &>/dev/null; then
         echo "Data de sfarsit este invalida. Try again."
         interval_pachete
         return
@@ -146,4 +155,3 @@ do
             ;;
     esac
 done
-
