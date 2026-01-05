@@ -98,7 +98,7 @@ istoric_pachet(){
 
     echo "======================= Istoria pentru pachetul: $package_name ======================="
     echo ""
-    rezultate=$(awk -F, -v pkg="$package_name" '$3 == pkg' "$csv_file")
+    rezultate=$(awk -F, -v pkg="$package_name" '$3 == pkg' "$csv_file" | sort -u)
     rez_similare=$(awk -F',' -v pkg="$package_name" '$3 ~ pkg {print $3}' "$csv_file" | sort -u)
 
     if [[ -z "$rezultate" ]]
@@ -131,7 +131,7 @@ interval_pachete(){
     echo "Introdu data de inceput:"
     read -r start
 
-     if ! date -d "$start" &>/dev/null; then
+     if ! [[ "$start" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || ! date -d "$start" &>/dev/null; then
         echo "Data de inceput este invalida. Try again."
         interval_pachete
         return
@@ -139,7 +139,7 @@ interval_pachete(){
 
     echo "Introdu data de sfarsit:"
     read -r end
-     if ! date -d "$end" &>/dev/null; then
+     if ! [[ "$end" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || ! date -d "$end" &>/dev/null; then
         echo "Data de sfarsit este invalida. Try again."
         interval_pachete
         return
@@ -245,3 +245,4 @@ do
     esac
 done
 
+exit 0
