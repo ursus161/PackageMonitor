@@ -1,11 +1,7 @@
 #!/bin/bash
 
-csv_file="../data/packages.csv"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 csv_file="$SCRIPT_DIR/../data/packages.csv"
-
-
-csv_file="../data/packages.csv"
 
 lista_pachete() {
   echo "=============================== Lista de pachete ============================== "
