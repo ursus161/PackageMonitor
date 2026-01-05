@@ -3,6 +3,94 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 csv_file="$SCRIPT_DIR/../data/packages.csv"
 
+lista_pachete() {
+  echo "=============================== Lista de pachete ============================== "
+  echo "Optiuni:"
+  echo "1. Pachete instalate si data ultimei instalari"
+  echo "2. Pachete instalate, dar eliminate si data ultimei eliminari"
+  echo "Introduceti optiunea (1/2):"
+  read optiune
+  case $optiune in
+    1) pachete_instalate
+      ;;
+    2) pachete_eliminate
+      ;;
+    *)
+      echo "Optiune invalida. Incearca din nou."
+            echo ""
+            echo "Apasă ENTER pentru a reveni la meniu..."
+            read
+            ;;
+  esac
+}
+
+pachete_instalate() {
+  echo "============================== Pachete instalate ============================== "
+  echo ""
+  tail -n +2 "$csv_file" | awk -F',' '
+  {
+    date = $1
+    action = $2
+    package = $3
+    version = $4
+
+    if (action == "installed") {
+      is_installed[package] = 1
+      install_date[package] = date
+    } else if (action == "removed") {
+      is_installed[package] = 0
+    }
+  }
+  END {
+    i = 0
+    printf "%-25s %-20s\n", "DATA ULTIMEI INSTALARI", "PACHET"
+    for (p in is_installed) {
+      if(is_installed[p] == 1) {
+        printf "%-25s %-20s\n", install_date[p], p
+        i++
+      }
+    }
+    print "============================================================================"
+      print "Total pachete instalate : " i
+  }'
+
+  echo ""
+  echo "Apasa ENTER pentru a reveni la meniu.."
+  read
+}
+
+pachete_eliminate() {
+  echo "============================= Pachete eliminate ============================="
+  echo ""
+  tail -n +2 "$csv_file" | awk -F',' '
+    {
+      date = $1
+      action = $2
+      package = $3
+
+      last_action[package] = action
+
+      if (action == "removed") {
+        last_removed_date[package] = date
+      }
+    }
+    END {
+      i = 0
+      printf "%-25s %-20s\n", "DATA ULTIMEI ELIMINARI", "PACHET"
+      for (p in last_action) {
+        if(last_action[p] == "removed") {
+          printf "%-25s %-20s\n", last_removed_date[p], p
+          i++
+        }
+      }
+      print "============================================================================"
+      print "Total pachete eliminate : " i
+  }'
+
+  echo ""
+  echo "Apasa ENTER pentru a reveni la meniu.."
+  read
+}
 
 istoric_pachet(){
     echo "Introdu numele pachetului:"
@@ -19,8 +107,8 @@ istoric_pachet(){
         echo "================================================================================"
         if [[ -n "$rez_similare" ]]
         then
-            echo "Dar am gasit rezultate similare pentru:" 
-            echo "$rez_similare" | head -5 
+            echo "Dar am gasit rezultate similare pentru:"
+            echo "$rez_similare" | head -5
             echo "================================================================================"
             echo ""
         fi
@@ -135,7 +223,8 @@ do
     read -r optiune
 
     case $optiune in
-        1) 
+        1)
+            lista_pachete
             ;;
         2)
             istoric_pachet
