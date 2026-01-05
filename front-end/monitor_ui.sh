@@ -227,7 +227,8 @@ do
     read -r optiune
 
     case $optiune in
-        1) 
+        1)
+            lista_pachete
             ;;
         2)
             istoric_pachet
