@@ -10,7 +10,7 @@ istoric_pachet(){
 
     echo "======================= Istoria pentru pachetul: $package_name ======================="
     echo ""
-    rezultate=$(awk -F, -v pkg="$package_name" '$3 == pkg' "$csv_file")
+    rezultate=$(awk -F, -v pkg="$package_name" '$3 == pkg' "$csv_file" | sort -u)
     rez_similare=$(awk -F',' -v pkg="$package_name" '$3 ~ pkg {print $3}' "$csv_file" | sort -u)
 
     if [[ -z "$rezultate" ]]
