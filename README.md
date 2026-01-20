@@ -72,6 +72,8 @@ PackageMonitor/
 ├── backend/
 │   ├── monitor.sh        - parseaza logurile si genereaza CSV-uri
 │   └── setup_cron.sh     - configureaza automatizarea
+├── frontend/
+│   └── packagemonitor.sh - interfata utilizator (meniu interactiv)
 └── data/
     ├── packages.csv
     ├── current_packages.csv
@@ -86,6 +88,7 @@ Am folosit path-uri absolute pentru ca scriptul sa functioneze corect din cron, 
 
 Backend-ul elimina duplicate automat si curata numele pachetelor de sufixe arhitectura.
 
+Frontend-ul ofera un meniu interactiv pentru vizualizarea datelor: lista pachete instalate, pachete eliminate, istoric pentru un pachet specific, operatii pe intervale de timp.
 ## Pentru frontend
 
 CSV-urile sunt gata de folosit pentru:
